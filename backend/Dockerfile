@@ -1,10 +1,7 @@
-FROM python:3.8
+FROM python:3.10-alpine
 
 RUN mkdir /app
 WORKDIR /app
-
-RUN apt update && \
-    apt install -y postgresql-client
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt

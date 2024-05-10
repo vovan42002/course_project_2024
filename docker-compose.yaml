@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 services:
 
@@ -25,7 +25,7 @@ services:
       - ./backend:/app/:cached
       - ./.docker/.ipython:/root/.ipython:cached
     environment:
-      DATABASE_URL: 'postgresql://postgres:password@postgres:5432/postgres'
+      DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/postgres'
     depends_on:
       - "postgres"
 
