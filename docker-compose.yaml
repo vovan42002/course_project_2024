@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: booking-db
     ports:
       - '5432:5432'
     volumes:
@@ -25,7 +26,7 @@ services:
       - ./backend:/app/:cached
       - ./.docker/.ipython:/root/.ipython:cached
     environment:
-      DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/postgres'
+      DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/booking-db'
     depends_on:
       - "postgres"
 
