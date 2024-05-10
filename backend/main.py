@@ -1,7 +1,9 @@
 from fastapi import FastAPI, APIRouter, status
-import core.schemas as schemas
-import uvicorn
-import core.config as config
+from core import config
+
+from api.login_router import login_router
+from api.user_router import user_router
+from api.health_router import health_router
 
 
 app = FastAPI(
@@ -11,20 +13,7 @@ app = FastAPI(
     description=config.PROJECT_DESCRIPTION,
 )
 
-router_test = APIRouter(prefix="/test")
 
-
-@router_test.get(
-    "/health",
-    response_model=schemas.HealthCheckResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Health Check",
-)
-async def health_status():
-    """
-    This method allows to check the service health
-    """
-    return {"status": "OK"}
-
-
-app.include_router(router=router_test)
+app.include_router(prefix="/test", router=health_router)
+app.include_router(prefix=config.API_VERSION, router=login_router)
+app.include_router(prefix=config.API_VERSION, router=user_router)
