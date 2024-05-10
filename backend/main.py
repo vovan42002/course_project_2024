@@ -28,9 +28,3 @@ async def health_status():
 
 
 app.include_router(router=router_test)
-
-uvicorn.run(
-    app=app,
-    host="0.0.0.0",
-    port=8000,
-)

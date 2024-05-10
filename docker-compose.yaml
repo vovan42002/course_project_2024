@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data:cached
+
+  backend:
+    container_name: backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app/:cached
+      - ./.docker/.ipython:/root/.ipython:cached
+    environment:
+      DATABASE_URL: 'postgresql://postgres:password@postgres:5432/postgres'
+    depends_on:
+      - "postgres"
+
+volumes:
+  db-data:
