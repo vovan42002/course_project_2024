@@ -5,6 +5,8 @@ from api.login_router import login_router
 from api.user_router import user_router
 from api.health_router import health_router
 from api.cinema_router import cinema_router
+from api.hall_router import hall_router
+from api.movie_router import movie_router
 
 
 app = FastAPI(
@@ -19,3 +21,5 @@ app.include_router(prefix="/test", router=health_router)
 app.include_router(prefix=config.API_VERSION, router=login_router)
 app.include_router(prefix=config.API_VERSION, router=user_router)
 app.include_router(prefix=config.API_VERSION, router=cinema_router)
+app.include_router(prefix=config.API_VERSION, router=hall_router)
+app.include_router(prefix=config.API_VERSION, router=movie_router)

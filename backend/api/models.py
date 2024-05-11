@@ -74,3 +74,48 @@ class CinemaUpdateRequest(TunedModel):
 
 class CinemaUpdated(TunedModel):
     cinema_id: int
+
+
+class HallCreate(TunedModel):
+    name: str
+    description: str
+    cinema_id: int
+
+
+class HallShow(BaseModel):
+    name: str
+    description: str
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class HallUpdateRequest(TunedModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+
+class HallUpdated(TunedModel):
+    hall_id: int
+
+
+class MovieCreate(TunedModel):
+    title: str
+    description: str
+
+
+class MovieShow(BaseModel):
+    title: str
+    description: str
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class MovieUpdateRequest(TunedModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
+class MovieUpdated(TunedModel):
+    movie_id: int
