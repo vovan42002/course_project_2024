@@ -29,11 +29,11 @@ class Cinema(Base):
     name = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, index=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     # foreignKey relations
     halls = relationship("Hall", back_populates="cinema")
@@ -46,11 +46,11 @@ class Hall(Base):
     name = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, index=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     # foreignKey
     cinema_id = Column(Integer, ForeignKey("cinemas.id"))
@@ -67,11 +67,11 @@ class Movie(Base):
     title = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, index=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     # foreignKey relations
     showings = relationship("Showing", back_populates="movie")
@@ -84,20 +84,20 @@ class Showing(Base):
     title = Column(String, unique=True, index=True, nullable=False)
     start = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     end = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(
         DateTime,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=datetime.now(),
+        onupdate=datetime.now(),
     )
     # foreignKey
     hall_id = Column(Integer, ForeignKey("halls.id"))

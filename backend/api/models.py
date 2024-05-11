@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -51,3 +52,25 @@ class HealthCheckResponse(BaseModel):
         description="A status of the service",
         example="OK",
     )
+
+
+class CinemaCreate(TunedModel):
+    name: str
+    description: str
+
+
+class CinemaShow(BaseModel):
+    name: str
+    description: str
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class CinemaUpdateRequest(TunedModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+
+class CinemaUpdated(TunedModel):
+    cinema_id: int
