@@ -97,3 +97,25 @@ class HallUpdateRequest(TunedModel):
 
 class HallUpdated(TunedModel):
     hall_id: int
+
+
+class MovieCreate(TunedModel):
+    title: str
+    description: str
+
+
+class MovieShow(BaseModel):
+    title: str
+    description: str
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class MovieUpdateRequest(TunedModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
+
+class MovieUpdated(TunedModel):
+    movie_id: int
