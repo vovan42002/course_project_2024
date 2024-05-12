@@ -1,6 +1,6 @@
 from sqlalchemy import update, select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-import datetime
+from datetime import datetime
 
 from db.models import User, Cinema, Hall, Movie, Showing, Seat, Book
 

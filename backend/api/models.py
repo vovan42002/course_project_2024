@@ -119,3 +119,32 @@ class MovieUpdateRequest(TunedModel):
 
 class MovieUpdated(TunedModel):
     movie_id: int
+
+
+class ShowingCreate(TunedModel):
+    title: str
+    start: datetime
+    end: datetime
+    hall_id: int
+    movie_id: int
+
+
+class ShowingShow(BaseModel):
+    title: str
+    start: datetime
+    end: datetime
+    hall_id: int
+    movie_id: int
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class ShowingUpdateRequest(TunedModel):
+    title: Optional[str] = None
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+
+
+class ShowingUpdated(TunedModel):
+    showing_id: int
