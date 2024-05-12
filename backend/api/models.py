@@ -170,3 +170,27 @@ class SeatUpdateRequest(TunedModel):
 
 class SeatUpdated(TunedModel):
     seat_id: int
+
+
+class BookCreate(TunedModel):
+    seat_id: int
+    user_id: int
+    showing_id: int
+
+
+class BookShow(BaseModel):
+    seat_id: int
+    user_id: int
+    showing_id: int
+    updated_at: datetime
+    created_at: datetime
+
+
+class BookUpdateRequest(TunedModel):
+    seat_id: Optional[int] = None
+    user_id: Optional[int] = None
+    showing_id: Optional[int] = None
+
+
+class BookUpdated(TunedModel):
+    book_id: int

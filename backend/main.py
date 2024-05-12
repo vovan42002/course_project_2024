@@ -9,6 +9,7 @@ from api.hall_router import hall_router
 from api.movie_router import movie_router
 from api.showing_router import showing_router
 from api.seat_router import seat_router
+from api.book_router import book_router
 
 
 app = FastAPI(
@@ -27,3 +28,4 @@ app.include_router(prefix=config.API_VERSION, router=hall_router)
 app.include_router(prefix=config.API_VERSION, router=movie_router)
 app.include_router(prefix=config.API_VERSION, router=showing_router)
 app.include_router(prefix=config.API_VERSION, router=seat_router)
+app.include_router(prefix=config.API_VERSION, router=book_router)
