@@ -148,3 +148,25 @@ class ShowingUpdateRequest(TunedModel):
 
 class ShowingUpdated(TunedModel):
     showing_id: int
+
+
+class SeatCreate(TunedModel):
+    number: int
+    hall_id: int
+
+
+class SeatShow(BaseModel):
+    number: int
+    hall_id: int
+    is_active: bool
+    updated_at: datetime
+    created_at: datetime
+
+
+class SeatUpdateRequest(TunedModel):
+    number: Optional[int] = None
+    hall_id: Optional[int] = None
+
+
+class SeatUpdated(TunedModel):
+    seat_id: int
