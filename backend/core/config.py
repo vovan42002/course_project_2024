@@ -15,3 +15,10 @@ API_VERSION: str = env.str("API_VERSION", default="/v1")
 SQLALCHEMY_DATABASE_URI: str = env.str("DATABASE_URL")
 ALGORITHM: str = env.str("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES: int = env.int("ACCESS_TOKEN_EXPIRE_MINUTES", default=60)
+
+
+ADMIN_USERNAME: str = env.str("ADMIN_USERNAME", default="admin")
+ADMIN_PASSWORD: str = env.str("ADMIN_PASSWORD", default="password")
+ADMIN_EMAIL: str = env.str("ADMIN_EMAIL", default="admin@gmail.com")
+ADMIN_FIRST_NAME: str = env.str("ADMIN_FIRST_NAME", default="John")
+ADMIN_LAST_NAME: str = env.str("ADMIN_LAST_NAME", default="Doe")

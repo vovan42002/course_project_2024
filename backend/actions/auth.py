@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from core import config
-from api.models import ShowUser
+from api.models import ShowUserWithRoles
 from db.dals import UserDAL
 from db.models import User
 from db.session import get_db
@@ -36,7 +36,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{config.API_VERSION}/token")
 
 async def get_current_user_from_token(
     token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_db)
-) -> ShowUser:
+) -> ShowUserWithRoles:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -52,8 +52,10 @@ async def get_current_user_from_token(
     user = await _get_user_by_email_for_auth(email=email, session=session)
     if user is None:
         raise credentials_exception
-    return ShowUser(
+    return ShowUserWithRoles(
         user_id=user.id,
         email=user.email,
         is_active=user.is_active,
+        is_superuser=user.is_superuser,
+        is_vendor=user.is_vendor,
     )

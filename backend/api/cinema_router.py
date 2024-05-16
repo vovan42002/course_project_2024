@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
+from actions.auth import get_current_user_from_token
 from api import models
+from core.permissions import check_role
+from db.models import User
 from db.session import get_db
 from actions.cinema import _create, _delete, _get_by_id, _update
 
@@ -13,7 +16,16 @@ cinema_router = APIRouter(prefix="/cinema")
 async def create_cinema(
     cinema: models.CinemaCreate,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.CinemaShow:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can create cinemas",
+        )
     new_cinema = await _create(body=cinema, session=session)
     if new_cinema is None:
         raise HTTPException(
@@ -29,7 +41,16 @@ async def create_cinema(
 async def delete_cinema(
     cinema_id: int,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.CinemaUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can delete cinemas",
+        )
     deleted_cinema_id = await _delete(cinema_id, session)
     if deleted_cinema_id is None:
         raise HTTPException(
@@ -65,7 +86,16 @@ async def update_cinema_by_id(
     cinema_id: int,
     body: models.CinemaUpdateRequest,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.CinemaUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can update cinemas",
+        )
     if body.dict(exclude_none=True) == {}:
         raise HTTPException(
             status_code=422,

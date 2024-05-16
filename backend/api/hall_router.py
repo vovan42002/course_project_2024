@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
+from actions.auth import get_current_user_from_token
 from api import models
+from core.permissions import check_role
+from db.models import User
 from db.session import get_db
 from actions.hall import _create, _delete, _get_by_id, _update
 
@@ -13,7 +16,16 @@ hall_router = APIRouter(prefix="/hall")
 async def create_hall(
     hall: models.HallCreate,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.HallShow:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can create halls",
+        )
     new_hall = await _create(body=hall, session=session)
     if new_hall is None:
         raise HTTPException(
@@ -29,7 +41,16 @@ async def create_hall(
 async def delete_hall(
     hall_id: int,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.HallUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can create halls",
+        )
     deleted_hall_id = await _delete(hall_id, session)
     if deleted_hall_id is None:
         raise HTTPException(status_code=404, detail=f"Hall with id {hall_id} not found")
@@ -61,7 +82,16 @@ async def update_hall_by_id(
     hall_id: int,
     body: models.HallUpdateRequest,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.HallUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can update halls",
+        )
     if body.dict(exclude_none=True) == {}:
         raise HTTPException(
             status_code=422,

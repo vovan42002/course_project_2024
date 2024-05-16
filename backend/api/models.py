@@ -15,6 +15,11 @@ class ShowUser(TunedModel):
     is_active: bool
 
 
+class ShowUserWithRoles(ShowUser):
+    is_superuser: bool
+    is_vendor: bool
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str

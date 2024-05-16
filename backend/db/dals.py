@@ -15,6 +15,8 @@ class UserDAL:
         hashed_password: str,
         first_name: str = None,
         last_name: str = None,
+        is_superuser: bool = False,
+        is_vendor: bool = False,
     ) -> User:
         try:
             new_user = User(
@@ -22,6 +24,8 @@ class UserDAL:
                 first_name=first_name,
                 last_name=last_name,
                 hashed_password=hashed_password,
+                is_superuser=is_superuser,
+                is_vendor=is_vendor,
             )
             self.db_session.add(new_user)
             await self.db_session.flush()

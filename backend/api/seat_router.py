@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from api import models
 from db.session import get_db
 from actions.seat import _create, _delete, _get_by_id, _update
+from core.permissions import check_role
+from db.models import User
+from actions.auth import get_current_user_from_token
 
 
 seat_router = APIRouter(prefix="/seat")
@@ -13,7 +16,16 @@ seat_router = APIRouter(prefix="/seat")
 async def create_seat(
     seat: models.SeatCreate,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.SeatShow:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can create seats",
+        )
     new_seat = await _create(body=seat, session=session)
     if new_seat is None:
         raise HTTPException(
@@ -29,7 +41,16 @@ async def create_seat(
 async def delete_seat(
     seat_id: int,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.SeatUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can delete seats",
+        )
     deleted_seat_id = await _delete(seat_id, session)
     if deleted_seat_id is None:
         raise HTTPException(status_code=404, detail=f"seat with id {seat_id} not found")
@@ -61,7 +82,16 @@ async def update_seat_by_id(
     seat_id: int,
     body: models.SeatUpdateRequest,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.SeatUpdated:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can delete seats",
+        )
     if body.dict(exclude_none=True) == {}:
         raise HTTPException(
             status_code=422,
