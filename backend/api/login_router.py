@@ -27,7 +27,12 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"email": user.email, "user_id": user.id},
+        data={
+            "email": user.email,
+            "user_id": user.id,
+            "vendor": user.is_vendor,
+            "admin": user.is_superuser,
+        },
         expires_delta=access_token_expires,
     )
     logging.debug("%s new token expires on %s", user.id, access_token_expires)

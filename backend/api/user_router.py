@@ -20,6 +20,8 @@ from actions.user import (
     check_permission,
 )
 
+from core.permissions import check_role
+
 user_router = APIRouter(prefix="/user")
 
 
@@ -61,6 +63,17 @@ async def get_user_by_id(
     session: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user_from_token),
 ) -> ShowUser:
+    if not check_role(allowed_roles=["user", "admin"], user=current_user):
+        logging.warn("User with id %s don't have enough permissions")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can get users",
+        )
+    if not await check_permission(user_id, current_user.user_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"User with id {current_user.user_id} cannot update user with id {user_id}",
+        )
     user = await _get_user_by_id(user_id, session)
     if user is None:
         logging.warning("User with id %s not found", user_id)
@@ -80,6 +93,12 @@ async def update_user_by_id(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"User with id {current_user.user_id} cannot update user with id {user_id}",
+        )
+    if not check_role(allowed_roles=["user", "admin"], user=current_user):
+        logging.warn("User with id %s don't have enough permissions")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can user itself and users",
         )
     if body.dict(exclude_none=True) == {}:
         raise HTTPException(

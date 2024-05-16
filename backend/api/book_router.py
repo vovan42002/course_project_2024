@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from api import models
 from db.session import get_db
 from actions.book import _create, _delete, _get_by_id, _update
-
+from core.permissions import check_role
+from actions.auth import get_current_user_from_token
+from db.models import User
 
 book_router = APIRouter(prefix="/book")
 
@@ -13,7 +15,16 @@ book_router = APIRouter(prefix="/book")
 async def create_book(
     book: models.BookCreate,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookShow:
+    if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only user, vendor or admin can create book",
+        )
     new_book = await _create(body=book, session=session)
     if new_book is None:
         raise HTTPException(
@@ -29,7 +40,16 @@ async def create_book(
 async def delete_book(
     book_id: int,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookUpdated:
+    if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only user, vendor or admin can delete book",
+        )
     deleted_book_id = await _delete(book_id, session)
     if deleted_book_id is None:
         raise HTTPException(status_code=404, detail=f"book with id {book_id} not found")
@@ -61,7 +81,16 @@ async def update_book_by_id(
     book_id: int,
     body: models.BookUpdateRequest,
     session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookUpdated:
+    if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only user, vendor or admin can update book",
+        )
     if body.dict(exclude_none=True) == {}:
         raise HTTPException(
             status_code=422,
