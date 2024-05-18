@@ -19,7 +19,9 @@ async def create_movie(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieShow:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions", current_user.id)
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin or vendor can create movies",
@@ -42,7 +44,9 @@ async def delete_movie(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions", current_user.id)
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin or vendor can update movies",
@@ -85,7 +89,9 @@ async def update_movie_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions", current_user.id)
+        logging.warn(
+            "User with email %s don't have enough permissions", current_user.email
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin or vendor can update movies",

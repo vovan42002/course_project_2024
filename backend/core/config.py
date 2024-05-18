@@ -12,7 +12,10 @@ SECRET_KEY: str = env.str(
 )
 API_VERSION: str = env.str("API_VERSION", default="/v1")
 
-SQLALCHEMY_DATABASE_URI: str = env.str("DATABASE_URL")
+SQLALCHEMY_DATABASE_URI: str = env.str(
+    "DATABASE_URL",
+    default="postgresql+asyncpg://postgres:password@postgres:5432/booking-db",
+)
 ALGORITHM: str = env.str("ALGORITHM", default="HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES: int = env.int("ACCESS_TOKEN_EXPIRE_MINUTES", default=60)
 
@@ -22,3 +25,6 @@ ADMIN_PASSWORD: str = env.str("ADMIN_PASSWORD", default="password")
 ADMIN_EMAIL: str = env.str("ADMIN_EMAIL", default="admin@gmail.com")
 ADMIN_FIRST_NAME: str = env.str("ADMIN_FIRST_NAME", default="John")
 ADMIN_LAST_NAME: str = env.str("ADMIN_LAST_NAME", default="Doe")
+
+CELERY_BROKER_URL: str = env.str("CELERY_BROKER_URL", default="")
+CELERY_RESULT_BACKEND_URL: str = env.str("CELERY_RESULT_BACKEND_URL", default="")

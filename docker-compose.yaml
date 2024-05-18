@@ -17,6 +17,7 @@ services:
 
   backend:
     container_name: backend
+    image: backend
     build:
       context: backend
       dockerfile: Dockerfile
@@ -29,6 +30,41 @@ services:
       DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/booking-db'
     depends_on:
       - "postgres"
+
+  redis:
+    image: redis:7.0
+    restart: always
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_HOST=redis
+
+  broker:
+    image: rabbitmq:3.13
+    volumes:
+      - .rabbitmq:/var/lib/rabbitmq/mnesia/
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_VHOST=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=password
+
+  worker:
+    image: backend
+    volumes:
+      - ./backend:/app/:cached
+      - ./.docker/.ipython:/root/.ipython:cached
+    depends_on:
+      - broker
+      - redis
+      - backend
+    command: "celery -A celery_app.celery_app worker -E -Q booking"
+    environment:
+      DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/booking-db'
+      CELERY_BROKER_URL: "amqp://rabbitmq:password@course_project_2024-broker-1:5672/rabbitmq"
+      CELERY_RESULT_BACKEND_URL: "redis://@course_project_2024-redis-1:6379/0"
 
 volumes:
   db-data:
