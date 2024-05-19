@@ -1,0 +1,57 @@
+replicaCount: 1
+
+image:
+  repository: docker.io/vovan4/course-project-2024-backend
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+app:
+  secretKey: ""
+  sqlalchemyDatabaseUri: ""
+  adminUsername: ""
+  adminPassword: ""
+  adminEmail: ""
+  adminFirstName: ""
+  adminLastName: ""
+  celeryBrokerURL: ""
+  celeryResultBackendURL: ""
+
+  worker:
+    command: "celery -A celery_app.celery_app worker -E -Q booking"
+
+ingress:
+  enabled: true
+  annotations: {}
+  class: "default-class"
+  host: "test.domain.com"
+  path: "/"
+  tls:
+    enabled: false
+    secretName: ""
+    cert: ""
+    key: ""
+    certificateIssuerName: ""
+    secretAutoCreate: false
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /test/health
+    port: http
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,66 @@
+{{- if .Values.ingress.enabled }}
+{{- if .Values.ingress.tls.secretAutoCreate }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.ingress.host }}
+spec:
+  secretName: {{ .Release.Name }}-secrets-tls
+  secretTemplate:
+    annotations:
+      meta.helm.sh/release-name: {{ .Release.Name }}
+      meta.helm.sh/release-namespace: {{ .Release.Namespace }}
+      app.kubernetes.io/managed-by: Helm
+    labels:
+      app.kubernetes.io/managed-by: Helm
+  issuerRef:
+    name: {{ .Values.ingress.tls.certificateIssuerName }}
+    kind: Issuer
+  commonName: {{ .Values.ingress.host }}
+  dnsNames:
+  - {{ .Values.ingress.host }}
+{{- end }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "backend.name" . }}-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - "{{ .Values.ingress.path }}"
+    forceSlash: true
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "backend.name" . }}-https
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
+  {{- with .Values.ingress.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+{{- if .Values.ingress.path }}
+      match: Host(`{{ .Values.ingress.host }}`) && PathPrefix(`{{ .Values.ingress.path }}`)
+{{- else }}
+      match: Host(`{{ .Values.ingress.host }}`)
+{{- end }}
+      middlewares:
+        - name: {{ include "backend.name" . }}-strip-prefix
+      services:
+        - name: {{ include "backend.name" . }}
+          namespace: {{ .Release.Namespace }}
+          port: {{ .Values.service.port }}
+          scheme: http
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    secretName: {{ .Values.ingress.tls.secretName }}
+    domains:
+      - main: {{ .Values.ingress.host }}
+  {{- end }}
+{{- end }}

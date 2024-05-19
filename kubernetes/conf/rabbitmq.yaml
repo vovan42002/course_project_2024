@@ -1,0 +1,11 @@
+auth:
+  password: xofo5ShaiT2upozoodai
+  erlangCookie: gaej9mahnge9Vooleaqu
+  username: backend
+ldap:
+  authorisationEnabled: true
+extraConfiguration: |-
+  default_vhost = backend
+  default_permissions.configure = .*
+  default_permissions.read = .*
+  default_permissions.write = .*

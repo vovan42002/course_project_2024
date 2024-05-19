@@ -1,0 +1,27 @@
+ports:
+  web:
+    expose: true
+  websecure:
+    expose: true
+resources:
+  requests:
+    memory: 128Mi
+    cpu: 50m
+  limits:
+    cpu: 2
+    memory: 2Gi
+service:
+  useLoadBalancerSsl: false
+  spec:
+    externalTrafficPolicy: Local
+logs:
+  general:
+    level: DEBUG
+  access:
+    enabled: true
+    fields:
+      headers:
+        # -- Available modes: keep, drop, redact.
+        defaultmode: keep
+
+
