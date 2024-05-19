@@ -2,6 +2,7 @@ import logging
 
 from fastapi import Depends
 
+
 from celery_app import celery_app
 from celery.exceptions import SoftTimeLimitExceeded
 from celery.states import SUCCESS, STARTED
@@ -13,18 +14,10 @@ from db.session import get_db2
 from sqlalchemy.ext.asyncio import AsyncSession
 from celery.signals import worker_ready
 import asyncio
+from api import models
 
 
 logger = logging.getLogger(__name__)
-
-
-@celery_app.task(
-    name="Create book",
-    queue="booking",
-)
-def add_book(self, request_data: str):
-    logger.info("Start main background celery task book")
-    return True
 
 
 @worker_ready.connect
