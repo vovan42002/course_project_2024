@@ -1,0 +1,93 @@
+environments:
+  default:
+    values:
+      - ns: dev
+        context: dev
+  dev:
+    values:
+      - ns: dev
+        context: dev
+---
+helmDefaults:
+  wait: true
+  historyMax: 3
+  atomic: true
+  timeout: 300
+  createNamespace: false
+  kubeContext: {{ .Environment.Values.context }}
+
+repositories:
+
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+  - name: traefik
+    url: https://traefik.github.io/charts
+
+
+commonLabels:
+  service-name: internal
+
+releases:
+
+  - name: ingress-controller
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: traefik/traefik
+    version: 26.0.0
+    disableValidation: true
+    values:
+      - ./conf/ingress-controller.yaml.gotmpl
+
+  - name: postgres
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: bitnami/postgresql
+    version: 15.3.3
+    values:
+    - ./conf/postgres.yaml
+
+  - name: redis
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: bitnami/redis
+    version: 19.3.3
+    values:
+      - architecture: standalone
+
+  - name: rabbitmq
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: bitnami/rabbitmq
+    version: 14.1.5
+    values:
+      - architecture: standalone
+
+  - name: backend
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: ./helm/backend
+    values:
+      - ./conf/backend.yaml
+    needs:
+      - {{ .Environment.Values.ns }}/ingress-controller
+      - {{ .Environment.Values.ns }}/postgres
+      - {{ .Environment.Values.ns }}/worker
+
+  - name: worker
+    installed: true
+    namespace: {{ .Environment.Values.ns }}
+    chart: ./helm/backend
+    values:
+      - ./conf/backend.yaml
+    needs:
+      - {{ .Environment.Values.ns }}/ingress-controller
+      - {{ .Environment.Values.ns }}/redis
+      - {{ .Environment.Values.ns }}/rabbitmq
+
+
+  
+
+
+
+
