@@ -34,10 +34,24 @@ services:
   redis:
     image: redis:7.0
     restart: always
+    container_name: redis_res_backend
     ports:
       - "6379:6379"
     environment:
       - REDIS_HOST=redis
+
+  broker:
+    image: rabbitmq:3.13
+    container_name: rabbitmq_broker
+    volumes:
+      - .rabbitmq:/var/lib/rabbitmq/mnesia/
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_VHOST=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=password
 
   worker:
     image: backend
@@ -50,8 +64,8 @@ services:
     command: "celery -A celery_app.celery_app worker -E -Q booking"
     environment:
       DATABASE_URL: 'postgresql+asyncpg://postgres:password@postgres:5432/booking-db'
-      CELERY_BROKER_URL: "redis://@course_project_2024-redis-1:6379/1"
-      CELERY_RESULT_BACKEND_URL: "redis://@course_project_2024-redis-1:6379/0"
+      CELERY_BROKER_URL: amqp://rabbitmq:password@rabbitmq_broker:5672/rabbitmq
+      CELERY_RESULT_BACKEND_URL: "redis://@redis_res_backend:6379/0"
 
 volumes:
   db-data:
