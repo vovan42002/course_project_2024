@@ -22,6 +22,42 @@ async def _create_new_user(body: UserCreate, session) -> Union[ShowUser, None]:
             )
 
 
+async def _create_new_vendor(body: UserCreate, session) -> Union[ShowUser, None]:
+    async with session.begin():
+        user_dal = UserDAL(session)
+        user = await user_dal.create_user(
+            email=body.email,
+            first_name=body.first_name,
+            last_name=body.last_name,
+            hashed_password=Hasher.get_password_hash(body.password),
+            is_vendor=True,
+        )
+        if user is not None:
+            return ShowUser(
+                user_id=user.id,
+                email=user.email,
+                is_active=user.is_active,
+            )
+
+
+async def _create_new_admin(body: UserCreate, session) -> Union[ShowUser, None]:
+    async with session.begin():
+        user_dal = UserDAL(session)
+        user = await user_dal.create_user(
+            email=body.email,
+            first_name=body.first_name,
+            last_name=body.last_name,
+            hashed_password=Hasher.get_password_hash(body.password),
+            is_superuser=True,
+        )
+        if user is not None:
+            return ShowUser(
+                user_id=user.id,
+                email=user.email,
+                is_active=user.is_active,
+            )
+
+
 async def _delete_user(user_id, session) -> Union[int, None]:
     async with session.begin():
         user_dal = UserDAL(session)
