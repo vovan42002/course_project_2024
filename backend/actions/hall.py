@@ -1,6 +1,6 @@
 from typing import Union
 
-from api.models import HallCreate, HallShow
+from api.models import AllHallsShow, HallCreate, HallShow
 from db.dals import HallDAL
 
 
@@ -48,3 +48,22 @@ async def _get_by_id(hall_id, session) -> Union[HallShow, None]:
                 created_at=hall.created_at,
                 updated_at=hall.updated_at,
             )
+
+
+async def _get_all(session) -> Union[AllHallsShow, None]:
+    async with session.begin():
+        hall_dal = HallDAL(session)
+        halls = await hall_dal.get_all_active()
+        halls_show = []
+        if halls is not None:
+            for hall in halls:
+                halls_show.append(
+                    HallShow(
+                        name=hall.name,
+                        description=hall.description,
+                        is_active=hall.is_active,
+                        created_at=hall.created_at,
+                        updated_at=hall.updated_at,
+                    )
+                )
+            return AllHallsShow(result=halls_show)

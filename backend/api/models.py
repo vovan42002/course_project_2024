@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
@@ -72,6 +72,10 @@ class CinemaShow(BaseModel):
     created_at: datetime
 
 
+class AllCinemasShow(BaseModel):
+    result: List[CinemaShow]
+
+
 class CinemaUpdateRequest(TunedModel):
     name: Optional[str] = None
     description: Optional[str] = None
@@ -95,6 +99,10 @@ class HallShow(BaseModel):
     created_at: datetime
 
 
+class AllHallsShow(BaseModel):
+    result: List[HallShow]
+
+
 class HallUpdateRequest(TunedModel):
     name: Optional[str] = None
     description: Optional[str] = None
@@ -115,6 +123,10 @@ class MovieShow(BaseModel):
     is_active: bool
     updated_at: datetime
     created_at: datetime
+
+
+class AllMoviesShow(BaseModel):
+    result: List[MovieShow]
 
 
 class MovieUpdateRequest(TunedModel):
@@ -145,6 +157,10 @@ class ShowingShow(BaseModel):
     created_at: datetime
 
 
+class AllShowingsShow(BaseModel):
+    result: List[ShowingShow]
+
+
 class ShowingUpdateRequest(TunedModel):
     title: Optional[str] = None
     start: Optional[datetime] = None
@@ -168,6 +184,10 @@ class SeatShow(BaseModel):
     created_at: datetime
 
 
+class AllSeatsShow(BaseModel):
+    result: List[SeatShow]
+
+
 class SeatUpdateRequest(TunedModel):
     number: Optional[int] = None
     hall_id: Optional[int] = None
@@ -189,6 +209,10 @@ class BookShow(BaseModel):
     showing_id: int
     updated_at: datetime
     created_at: datetime
+
+
+class AllUserBooksShow(BaseModel):
+    result: List[BookShow]
 
 
 class BookUpdateRequest(TunedModel):

@@ -1,6 +1,6 @@
 from typing import Union
 
-from api.models import MovieCreate, MovieShow
+from api.models import AllMoviesShow, MovieCreate, MovieShow
 from db.dals import MovieDAL
 
 
@@ -49,3 +49,22 @@ async def _get_by_id(movie_id, session) -> Union[MovieShow, None]:
                 created_at=movie.created_at,
                 updated_at=movie.updated_at,
             )
+
+
+async def _get_all(session) -> Union[AllMoviesShow, None]:
+    async with session.begin():
+        movie_dal = MovieDAL(session)
+        movies = await movie_dal.get_all_active()
+        movies_show = []
+        if movies is not None:
+            for movie in movies:
+                movies_show.append(
+                    MovieShow(
+                        title=movie.title,
+                        description=movie.description,
+                        is_active=movie.is_active,
+                        created_at=movie.created_at,
+                        updated_at=movie.updated_at,
+                    )
+                )
+            return AllMoviesShow(result=movies_show)

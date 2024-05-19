@@ -128,6 +128,13 @@ class CinemaDAL:
         if update_cinema_id_row is not None:
             return update_cinema_id_row[0]
 
+    async def get_all_active(self) -> list[Cinema]:
+        query = select(Cinema).where(Cinema.is_active == True)
+        res = await self.db_session.execute(query)
+        cinemas = res.scalars().all()
+        if cinemas is not None:
+            return cinemas
+
 
 class HallDAL:
     def __init__(self, db_session: AsyncSession):
@@ -188,6 +195,13 @@ class HallDAL:
         if updated_hall_id_row is not None:
             return updated_hall_id_row[0]
 
+    async def get_all_active(self) -> list[Hall]:
+        query = select(Hall).where(Hall.is_active == True)
+        res = await self.db_session.execute(query)
+        halls = res.scalars().all()
+        if halls is not None:
+            return halls
+
 
 class MovieDAL:
     def __init__(self, db_session: AsyncSession):
@@ -245,6 +259,13 @@ class MovieDAL:
         updated_movie_id_row = res.fetchone()
         if updated_movie_id_row is not None:
             return updated_movie_id_row[0]
+
+    async def get_all_active(self) -> list[Movie]:
+        query = select(Movie).where(Movie.is_active == True)
+        res = await self.db_session.execute(query)
+        movies = res.scalars().all()
+        if movies is not None:
+            return movies
 
 
 class ShowingDAL:
@@ -305,6 +326,13 @@ class ShowingDAL:
         if updated_showing_id_row is not None:
             return updated_showing_id_row[0]
 
+    async def get_all_active(self) -> list[Showing]:
+        query = select(Showing).where(Showing.is_active == True)
+        res = await self.db_session.execute(query)
+        showings = res.scalars().all()
+        if showings is not None:
+            return showings
+
 
 class SeatDAL:
     def __init__(self, db_session: AsyncSession):
@@ -358,6 +386,13 @@ class SeatDAL:
         if updated_seat_id_row is not None:
             return updated_seat_id_row[0]
 
+    async def get_all_active(self) -> list[Seat]:
+        query = select(Seat).where(Seat.is_active == True)
+        res = await self.db_session.execute(query)
+        seats = res.scalars().all()
+        if seats is not None:
+            return seats
+
 
 class BookDAL:
     def __init__(self, db_session: AsyncSession):
@@ -407,3 +442,10 @@ class BookDAL:
         updated_book_id_row = res.fetchone()
         if updated_book_id_row is not None:
             return updated_book_id_row[0]
+
+    async def get_by_user_id(self, user_id: int) -> list[Book]:
+        query = select(Book).where(Book.user_id == user_id)
+        res = await self.db_session.execute(query)
+        books = res.scalars().all()
+        if books is not None:
+            return books

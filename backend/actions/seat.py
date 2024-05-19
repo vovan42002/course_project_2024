@@ -1,6 +1,6 @@
 from typing import Union
 
-from api.models import SeatCreate, SeatShow
+from api.models import AllSeatsShow, SeatCreate, SeatShow
 from db.dals import SeatDAL
 
 
@@ -47,3 +47,22 @@ async def _get_by_id(seat_id, session) -> Union[SeatShow, None]:
                 created_at=seat.created_at,
                 updated_at=seat.updated_at,
             )
+
+
+async def _get_all(session) -> Union[AllSeatsShow, None]:
+    async with session.begin():
+        seat_dal = SeatDAL(session)
+        seats = await seat_dal.get_all_active()
+        seats_show = []
+        if seats is not None:
+            for seat in seats:
+                seats_show.append(
+                    SeatShow(
+                        number=seat.number,
+                        hall_id=seat.hall_id,
+                        is_active=seat.is_active,
+                        created_at=seat.created_at,
+                        updated_at=seat.updated_at,
+                    )
+                )
+            return AllSeatsShow(result=seats_show)

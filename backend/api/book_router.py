@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from api import models
 from db.session import get_db
-from actions.book import _create, _delete, _get_by_id, _update
+from actions.book import _create, _delete, _get_by_id, _update, _get_all_by_user_id
 from core.permissions import check_role
 from actions.auth import get_current_user_from_token
 from db.models import User
@@ -28,7 +28,8 @@ async def create_book(
     new_book = await _create(body=book, session=session)
     if new_book is None:
         raise HTTPException(
-            status_code=404, detail=f"Book with name {book.name} already exists"
+            status_code=404,
+            detail=f"Book for user {book.user_id} seat {book.seat_id} showing {book.showing_id} already exists",
         )
     return new_book
 
@@ -58,7 +59,7 @@ async def delete_book(
 
 
 @book_router.get(
-    "/{book_id}",
+    "/{book_id:int}",
     response_model=models.BookShow,
 )
 async def get_book_by_id(
@@ -71,6 +72,25 @@ async def get_book_by_id(
         raise HTTPException(status_code=404, detail=f"book with id {book_id} not found")
     logging.info("book with id %s found", book_id)
     return book
+
+
+@book_router.get(
+    "/all/{user_id}",
+    response_model=models.AllUserBooksShow,
+)
+async def get_all_halls(
+    user_id: int,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+) -> models.AllUserBooksShow:
+    books = await _get_all_by_user_id(session=session, user_id=user_id)
+    if books is None:
+        logging.warning("books for user %s not found", user_id)
+        raise HTTPException(
+            status_code=404, detail=f"Books for user {user_id} not found"
+        )
+    logging.info("Fetch all books")
+    return books
 
 
 @book_router.patch(

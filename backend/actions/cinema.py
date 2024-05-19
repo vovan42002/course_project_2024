@@ -1,6 +1,6 @@
 from typing import Union
 
-from api.models import CinemaCreate, CinemaShow
+from api.models import AllCinemasShow, CinemaCreate, CinemaShow
 from db.dals import CinemaDAL
 
 
@@ -51,3 +51,22 @@ async def _get_by_id(cinema_id, session) -> Union[CinemaShow, None]:
                 created_at=cinema.created_at,
                 updated_at=cinema.updated_at,
             )
+
+
+async def _get_all(session) -> Union[AllCinemasShow, None]:
+    async with session.begin():
+        cinema_dal = CinemaDAL(session)
+        cinemas = await cinema_dal.get_all_active()
+        cinemas_show = []
+        if cinemas is not None:
+            for cinema in cinemas:
+                cinemas_show.append(
+                    CinemaShow(
+                        name=cinema.name,
+                        description=cinema.description,
+                        is_active=cinema.is_active,
+                        created_at=cinema.created_at,
+                        updated_at=cinema.updated_at,
+                    )
+                )
+            return AllCinemasShow(result=cinemas_show)

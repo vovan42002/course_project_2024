@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from api import models
 from db.session import get_db
-from actions.seat import _create, _delete, _get_by_id, _update
+from actions.seat import _create, _delete, _get_by_id, _update, _get_all
 from core.permissions import check_role
 from db.models import User
 from actions.auth import get_current_user_from_token
@@ -29,7 +29,7 @@ async def create_seat(
     new_seat = await _create(body=seat, session=session)
     if new_seat is None:
         raise HTTPException(
-            status_code=404, detail=f"Seat with name {seat.name} already exists"
+            status_code=404, detail=f"Seat number {seat.number} already exists"
         )
     return new_seat
 
@@ -59,7 +59,7 @@ async def delete_seat(
 
 
 @seat_router.get(
-    "/{seat_id}",
+    "/{seat_id:int}",
     response_model=models.SeatShow,
 )
 async def get_seat_by_id(
@@ -72,6 +72,21 @@ async def get_seat_by_id(
         raise HTTPException(status_code=404, detail=f"Seat with id {seat_id} not found")
     logging.info("Seat with id %s found", seat_id)
     return seat
+
+
+@seat_router.get(
+    "/all",
+    response_model=models.AllSeatsShow,
+)
+async def get_all_halls(
+    session: AsyncSession = Depends(get_db),
+) -> models.AllSeatsShow:
+    seats = await _get_all(session=session)
+    if seats is None:
+        logging.warning("seats not found")
+        raise HTTPException(status_code=404, detail="seats not found")
+    logging.info("Fetch all seats")
+    return seats
 
 
 @seat_router.patch(
