@@ -17,6 +17,8 @@ from actions.user import (
     _delete_user,
     _update_user,
     _get_user_by_id,
+    _create_new_admin,
+    _create_new_vendor,
     check_permission,
 )
 
@@ -31,6 +33,48 @@ async def create_user(
     session: AsyncSession = Depends(get_db),
 ) -> ShowUser:
     new_user = await _create_new_user(user, session)
+    if new_user is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with email {user.email} already exists"
+        )
+    logging.info("Create new user with id: %s", new_user.user_id)
+    return new_user
+
+
+@user_router.post("/vendor", response_model=ShowUser)
+async def create_vendor(
+    user: UserCreate,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+) -> ShowUser:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn("User with id %s don't have enough permissions")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can get create vendors",
+        )
+    new_user = await _create_new_vendor(user, session)
+    if new_user is None:
+        raise HTTPException(
+            status_code=404, detail=f"User with email {user.email} already exists"
+        )
+    logging.info("Create new user with id: %s", new_user.user_id)
+    return new_user
+
+
+@user_router.post("/admin", response_model=ShowUser)
+async def create_admin(
+    user: UserCreate,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user_from_token),
+) -> ShowUser:
+    if not check_role(allowed_roles=["admin"], user=current_user):
+        logging.warn("User with id %s don't have enough permissions")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only admin can get create another admins",
+        )
+    new_user = await _create_new_admin(user, session)
     if new_user is None:
         raise HTTPException(
             status_code=404, detail=f"User with email {user.email} already exists"
