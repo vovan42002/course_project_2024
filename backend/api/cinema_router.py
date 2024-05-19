@@ -6,7 +6,7 @@ from api import models
 from core.permissions import check_role
 from db.models import User
 from db.session import get_db
-from actions.cinema import _create, _delete, _get_by_id, _update
+from actions.cinema import _create, _delete, _get_by_id, _update, _get_all
 
 
 cinema_router = APIRouter(prefix="/cinema")
@@ -61,7 +61,7 @@ async def delete_cinema(
 
 
 @cinema_router.get(
-    "/{cinema_id}",
+    "/{cinema_id:int}",
     response_model=models.CinemaShow,
 )
 async def get_cinema_by_id(
@@ -76,6 +76,21 @@ async def get_cinema_by_id(
         )
     logging.info("Cinema with id %s found", cinema_id)
     return cinema
+
+
+@cinema_router.get(
+    "/all",
+    response_model=models.AllCinemasShow,
+)
+async def get_all_cinemas(
+    session: AsyncSession = Depends(get_db),
+) -> models.AllCinemasShow:
+    cinemas = await _get_all(session=session)
+    if cinemas is None:
+        logging.warning("Cinemas not found")
+        raise HTTPException(status_code=404, detail=f"Cinemas not found")
+    logging.info("Fetch all cinemas")
+    return cinemas
 
 
 @cinema_router.patch(

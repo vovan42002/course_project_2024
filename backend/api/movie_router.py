@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 from api import models
 from db.session import get_db
-from actions.movie import _create, _delete, _get_by_id, _update
+from actions.movie import _create, _delete, _get_all, _get_by_id, _update
 from core.permissions import check_role
 from db.models import User
 from actions.auth import get_current_user_from_token
@@ -61,7 +61,7 @@ async def delete_movie(
 
 
 @movie_router.get(
-    "/{movie_id}",
+    "/{movie_id:int}",
     response_model=models.MovieShow,
 )
 async def get_movie_by_id(
@@ -76,6 +76,21 @@ async def get_movie_by_id(
         )
     logging.info("movie with id %s found", movie_id)
     return movie
+
+
+@movie_router.get(
+    "/all",
+    response_model=models.AllMoviesShow,
+)
+async def get_all_halls(
+    session: AsyncSession = Depends(get_db),
+) -> models.AllMoviesShow:
+    movies = await _get_all(session=session)
+    if movies is None:
+        logging.warning("Movies not found")
+        raise HTTPException(status_code=404, detail="Movies not found")
+    logging.info("Fetch all movies")
+    return movies
 
 
 @movie_router.patch(

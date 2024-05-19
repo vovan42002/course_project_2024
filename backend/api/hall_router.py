@@ -6,7 +6,7 @@ from api import models
 from core.permissions import check_role
 from db.models import User
 from db.session import get_db
-from actions.hall import _create, _delete, _get_by_id, _update
+from actions.hall import _create, _delete, _get_all, _get_by_id, _update
 
 
 hall_router = APIRouter(prefix="/hall")
@@ -59,7 +59,7 @@ async def delete_hall(
 
 
 @hall_router.get(
-    "/{hall_id}",
+    "/{hall_id:int}",
     response_model=models.HallShow,
 )
 async def get_hall_by_id(
@@ -72,6 +72,21 @@ async def get_hall_by_id(
         raise HTTPException(status_code=404, detail=f"Hall with id {hall_id} not found")
     logging.info("Hall with id %s found", hall_id)
     return hall
+
+
+@hall_router.get(
+    "/all",
+    response_model=models.AllHallsShow,
+)
+async def get_all_halls(
+    session: AsyncSession = Depends(get_db),
+) -> models.AllHallsShow:
+    halls = await _get_all(session=session)
+    if halls is None:
+        logging.warning("Halls not found")
+        raise HTTPException(status_code=404, detail="Halls not found")
+    logging.info("Fetch all halls")
+    return halls
 
 
 @hall_router.patch(
