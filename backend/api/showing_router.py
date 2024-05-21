@@ -20,7 +20,7 @@ async def create_showing(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.ShowingShow:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -45,7 +45,7 @@ async def delete_showing(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.ShowingUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -105,7 +105,7 @@ async def update_showing_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.ShowingUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
