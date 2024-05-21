@@ -19,7 +19,7 @@ async def create_movie(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieShow:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -44,7 +44,7 @@ async def delete_movie(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -104,7 +104,7 @@ async def update_movie_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.MovieUpdated:
     if not check_role(allowed_roles=["vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(

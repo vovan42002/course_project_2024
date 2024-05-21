@@ -18,7 +18,7 @@ async def create_book(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookShow:
     if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -44,7 +44,7 @@ async def delete_book(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookUpdated:
     if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(
@@ -85,7 +85,7 @@ async def get_all_halls(
 ) -> models.AllUserBooksShow:
     books = await _get_all_by_user_id(session=session, user_id=user_id)
     if books is None:
-        logging.warning("books for user %s not found", user_id)
+        logging.warninging("books for user %s not found", user_id)
         raise HTTPException(
             status_code=404, detail=f"Books for user {user_id} not found"
         )
@@ -104,7 +104,7 @@ async def update_book_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> models.BookUpdated:
     if not check_role(allowed_roles=["user", "vendor", "admin"], user=current_user):
-        logging.warn(
+        logging.warning(
             "User with email %s don't have enough permissions", current_user.email
         )
         raise HTTPException(

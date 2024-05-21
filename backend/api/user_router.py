@@ -48,7 +48,7 @@ async def create_vendor(
     current_user: User = Depends(get_current_user_from_token),
 ) -> ShowUser:
     if not check_role(allowed_roles=["admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions")
+        logging.warning("User with id %s don't have enough permissions")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can get create vendors",
@@ -69,7 +69,7 @@ async def create_admin(
     current_user: User = Depends(get_current_user_from_token),
 ) -> ShowUser:
     if not check_role(allowed_roles=["admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions")
+        logging.warning("User with id %s don't have enough permissions")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can get create another admins",
@@ -108,7 +108,7 @@ async def get_user_by_id(
     current_user: User = Depends(get_current_user_from_token),
 ) -> ShowUser:
     if not check_role(allowed_roles=["user", "admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions")
+        logging.warning("User with id %s don't have enough permissions")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can get users",
@@ -139,7 +139,7 @@ async def update_user_by_id(
             detail=f"User with id {current_user.user_id} cannot update user with id {user_id}",
         )
     if not check_role(allowed_roles=["user", "admin"], user=current_user):
-        logging.warn("User with id %s don't have enough permissions")
+        logging.warning("User with id %s don't have enough permissions")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admin can user itself and users",
