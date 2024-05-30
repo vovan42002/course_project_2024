@@ -4,9 +4,11 @@ import logging
 from api import models
 from db.session import get_db
 from actions.book import _create, _delete, _get_by_id, _update, _get_all_by_user_id
+from actions import seat
 from core.permissions import check_role
 from actions.auth import get_current_user_from_token
 from db.models import User
+import tasks
 
 book_router = APIRouter(prefix="/book")
 
@@ -26,6 +28,10 @@ async def create_book(
             detail="Only user, vendor or admin can create book",
         )
     new_book = await _create(body=book, session=session)
+
+    seat_number = await seat._get_by_id(new_book.seat_id, session=session)
+
+    tasks.run_send_email.apply_async(args=(seat_number.number, current_user.email))
     if new_book is None:
         raise HTTPException(
             status_code=404,

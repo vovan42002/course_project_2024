@@ -28,3 +28,6 @@ ADMIN_LAST_NAME: str = env.str("ADMIN_LAST_NAME", default="Doe")
 
 CELERY_BROKER_URL: str = env.str("CELERY_BROKER_URL", default="")
 CELERY_RESULT_BACKEND_URL: str = env.str("CELERY_RESULT_BACKEND_URL", default="")
+
+EMAIL_SENDER: str = env.str("EMAIL_SENDER", default="")
+EMAIL_SENDER_PASSWORD: str = env.str("EMAIL_SENDER_PASSWORD", default="")
