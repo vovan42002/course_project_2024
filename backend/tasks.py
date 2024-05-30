@@ -1,20 +1,14 @@
 import logging
 
-from fastapi import Depends
-
 
 from celery_app import celery_app
-from celery.exceptions import SoftTimeLimitExceeded
-from celery.states import SUCCESS, STARTED
-from celery.result import AsyncResult
 from core import config
 from core.hashing import Hasher
 from db.dals import UserDAL
 from db.session import get_db2
-from sqlalchemy.ext.asyncio import AsyncSession
 from celery.signals import worker_ready
 import asyncio
-from api import models
+from core.send_email import send_email
 
 
 logger = logging.getLogger(__name__)
@@ -52,3 +46,16 @@ def at_start(sender, **kwargs):
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(init_admin_user())
+
+
+@celery_app.task(queue="booking")
+def run_send_email(
+    seat: int,
+    recipient: str,
+):
+    logger.info("Start celery task to send email")
+    try:
+        send_email(f"You successfully booked seat {seat}", recipient)
+    except Exception as e:
+        logger.error(f"Failed to send email: {e}")
+    return True
