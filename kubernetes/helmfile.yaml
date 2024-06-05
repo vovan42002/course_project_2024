@@ -30,14 +30,14 @@ commonLabels:
 
 releases:
 
-  - name: ingress-controller
-    installed: true
-    namespace: {{ .Environment.Values.ns }}
-    chart: traefik/traefik
-    version: 26.0.0
-    disableValidation: true
-    values:
-      - ./conf/ingress-controller.yaml.gotmpl
+#  - name: ingress-controller
+#    installed: true
+#    namespace: {{ .Environment.Values.ns }}
+#    chart: traefik/traefik
+#    version: 26.0.0
+#    disableValidation: true
+#    values:
+#      - ./conf/ingress-controller.yaml.gotmpl
 
   - name: postgres
     installed: true
@@ -54,14 +54,8 @@ releases:
     version: 19.3.3
     values:
       - architecture: standalone
-
-  - name: rabbitmq
-    installed: true
-    namespace: {{ .Environment.Values.ns }}
-    chart: bitnami/rabbitmq
-    version: 14.1.5
-    values:
-      - architecture: standalone
+      - auth:
+          password: redis_pass
 
   - name: backend
     installed: true
@@ -69,8 +63,10 @@ releases:
     chart: ./helm/backend
     values:
       - ./conf/backend.yaml
+      - fullnameOverride: backend
+      - app:
+          mode: app
     needs:
-      - {{ .Environment.Values.ns }}/ingress-controller
       - {{ .Environment.Values.ns }}/postgres
       - {{ .Environment.Values.ns }}/worker
 
@@ -80,10 +76,13 @@ releases:
     chart: ./helm/backend
     values:
       - ./conf/backend.yaml
+      - ingress:
+          enabled: false
+      - fullnameOverride: worker
+      - app:
+          mode: worker
     needs:
-      - {{ .Environment.Values.ns }}/ingress-controller
       - {{ .Environment.Values.ns }}/redis
-      - {{ .Environment.Values.ns }}/rabbitmq
 
 
   

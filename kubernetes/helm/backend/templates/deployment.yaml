@@ -11,8 +11,9 @@ spec:
       {{- include "backend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Chart.Name "/templates/secret-env.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -26,15 +27,17 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if eq .Values.app.mode "worker" }}
           {{- if .Values.app.worker.command }}
           command:
-            - /bin/bash
+            - /bin/sh
             - -c
             - >
               {{ .Values.app.worker.command  }}
+          {{- end }}
           {{- end }}
           ports:
             - name: http
@@ -42,7 +45,7 @@ spec:
               protocol: TCP
           envFrom:
             - secretRef:
-                name: {{ include "backend.name" . }}-env
+                name: {{ include "backend.fullname" . }}-env
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           resources:

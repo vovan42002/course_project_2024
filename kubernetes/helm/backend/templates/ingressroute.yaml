@@ -1,3 +1,4 @@
+{{- if eq .Values.app.mode "app" }}
 {{- if .Values.ingress.enabled }}
 {{- if .Values.ingress.tls.secretAutoCreate }}
 apiVersion: cert-manager.io/v1
@@ -34,9 +35,29 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
+  name: {{ include "backend.fullname" . }}-http
+  annotations:
+  {{- with .Values.ingress.annotations }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`{{ .Values.ingress.host }}`) && PathPrefix(`{{ .Values.ingress.path }}`)
+      kind: Rule
+      services:
+        - name: {{ include "backend.fullname" . }}
+          namespace: {{ .Release.Namespace }}
+          port: {{ .Values.service.port }}
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
   name: {{ include "backend.name" . }}-https
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
   {{- with .Values.ingress.annotations }}
   {{- toYaml . | nindent 4 }}
   {{- end }}
@@ -51,9 +72,9 @@ spec:
       match: Host(`{{ .Values.ingress.host }}`)
 {{- end }}
       middlewares:
-        - name: {{ include "backend.name" . }}-strip-prefix
+        - name: {{ include "backend.fullname" . }}-strip-prefix
       services:
-        - name: {{ include "backend.name" . }}
+        - name: {{ include "backend.fullname" . }}
           namespace: {{ .Release.Namespace }}
           port: {{ .Values.service.port }}
           scheme: http
@@ -63,4 +84,5 @@ spec:
     domains:
       - main: {{ .Values.ingress.host }}
   {{- end }}
+{{- end }}
 {{- end }}
