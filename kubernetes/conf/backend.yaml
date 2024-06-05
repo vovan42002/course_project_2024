@@ -1,13 +1,16 @@
 app:
   secretKey: "foaxae4aitahphaiFai8queisu1eikie3Ohf7yae9Mei1aezeejobie2zeil2are"
-  sqlalchemyDatabaseUri: "postgresql+asyncpg://backend:backend-pass@postgres:5432/backend"
+  sqlalchemyDatabaseUri: "postgresql+asyncpg://backend:backend-pass@postgres-postgresql:5432/backend"
   adminUsername: "admin"
   adminPassword: "password"
   adminEmail: "admin@gmail.com"
   adminFirstName: "John"
   adminLastName: "Doe"
-  celeryBrokerURL: "amqp://backend:password@rabbitmq:5672/backend"
-  celeryResultBackendURL: "redis://@redis:6379/0"
+  celeryBrokerURL: "redis://:redis_pass@redis-master:6379/1"
+  celeryResultBackendURL: "redis://:redis_pass@redis-master:6379/0"
+  emailSender: ""
+  emailSenderPassword: ""
+
 
 ingress:
   enabled: true
@@ -18,4 +21,4 @@ ingress:
     enabled: false
     secretName: "backend-secrets-tls"
     certificateIssuerName: "issuer-dev"
-    secretAutoCreate: true
+    secretAutoCreate: false

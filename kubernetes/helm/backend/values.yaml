@@ -18,6 +18,7 @@ service:
   port: 8000
 
 app:
+  mode: worker # app
   secretKey: ""
   sqlalchemyDatabaseUri: ""
   adminUsername: ""
@@ -27,6 +28,8 @@ app:
   adminLastName: ""
   celeryBrokerURL: ""
   celeryResultBackendURL: ""
+  emailSender: ""
+  emailSenderPassword: ""
 
   worker:
     command: "celery -A celery_app.celery_app worker -E -Q booking"
